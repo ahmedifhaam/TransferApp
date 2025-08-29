@@ -1,6 +1,8 @@
+import { environment } from '../environments/environment';
+
 export const API_CONFIG = {
   // Base API URL - change this in one place to update all endpoints
-  BASE_URL: 'http://localhost:5000/api',
+  BASE_URL: environment.apiUrl,
   
   // Auth endpoints
   AUTH: {
