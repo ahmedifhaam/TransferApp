@@ -1,0 +1,45 @@
+<div class="container py-4">
+  <h2 class="mb-4">Login</h2>
+
+  <div class="row">
+    <!-- Admin Login -->
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header bg-light">Admin Login</div>
+        <div class="card-body">
+          <div *ngIf="adminError" class="alert alert-danger">{{ adminError }}</div>
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input class="form-control" [(ngModel)]="adminUsername" placeholder="admin" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input class="form-control" [(ngModel)]="adminPassword" type="password" placeholder="••••••" />
+          </div>
+          <button class="btn btn-primary" (click)="loginAdmin()">Login as Admin</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Doctor Login -->
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header bg-light">Doctor Login</div>
+        <div class="card-body">
+          <div *ngIf="doctorError" class="alert alert-danger">{{ doctorError }}</div>
+          <div class="mb-3">
+            <label class="form-label">Merit Rank</label>
+            <input class="form-control" [(ngModel)]="meritRank" type="number" min="1" placeholder="Enter Merit Rank" />
+          </div>
+          <button class="btn btn-outline-primary me-2" (click)="lookupDoctor()">Find</button>
+
+          <div *ngIf="doctor" class="alert alert-secondary mt-3">
+            <div><strong>{{ doctor.fullName }}</strong></div>
+            <div>Merit Rank: {{ doctor.meritRank }}</div>
+            <button class="btn btn-success mt-2" (click)="confirmDoctor()">Confirm and Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container">
+    <a class="navbar-brand" href="#">Medical Transfer App</a>
+    <div class="navbar-nav">
+      <a class="nav-link" routerLink="/vacancies" routerLinkActive="active">Vacancies</a>
+      <a class="nav-link" routerLink="/preferences" routerLinkActive="active" *ngIf="authService.isDoctor()">Preferences</a>
+      <a class="nav-link" routerLink="/pdf-preferences" routerLinkActive="active" *ngIf="authService.isDoctor()">PDF Preferences</a>
+      <a class="nav-link" routerLink="/import" routerLinkActive="active" *ngIf="authService.isAdmin()">Import Data</a>
+      <a class="nav-link" routerLink="/reports" routerLinkActive="active">Reports</a>
+      <a class="nav-link" routerLink="/login" routerLinkActive="active" *ngIf="!authService.state">Login</a>
+    </div>
+    <div class="ms-auto" *ngIf="authService.state">
+      <button class="btn btn-sm btn-outline-light" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <router-outlet></router-outlet>
+</div>

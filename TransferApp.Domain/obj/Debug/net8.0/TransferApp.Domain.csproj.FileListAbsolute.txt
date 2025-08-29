@@ -1,0 +1,11 @@
+D:\PersonalProjects\TransferApp\TransferApp.Domain\bin\Debug\net8.0\TransferApp.Domain.deps.json
+D:\PersonalProjects\TransferApp\TransferApp.Domain\bin\Debug\net8.0\TransferApp.Domain.dll
+D:\PersonalProjects\TransferApp\TransferApp.Domain\bin\Debug\net8.0\TransferApp.Domain.pdb
+D:\PersonalProjects\TransferApp\TransferApp.Domain\obj\Debug\net8.0\TransferApp.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\PersonalProjects\TransferApp\TransferApp.Domain\obj\Debug\net8.0\TransferApp.Domain.AssemblyInfoInputs.cache
+D:\PersonalProjects\TransferApp\TransferApp.Domain\obj\Debug\net8.0\TransferApp.Domain.AssemblyInfo.cs
+D:\PersonalProjects\TransferApp\TransferApp.Domain\obj\Debug\net8.0\TransferApp.Domain.csproj.CoreCompileInputs.cache
+D:\PersonalProjects\TransferApp\TransferApp.Domain\obj\Debug\net8.0\TransferApp.Domain.dll
+D:\PersonalProjects\TransferApp\TransferApp.Domain\obj\Debug\net8.0\refint\TransferApp.Domain.dll
+D:\PersonalProjects\TransferApp\TransferApp.Domain\obj\Debug\net8.0\TransferApp.Domain.pdb
+D:\PersonalProjects\TransferApp\TransferApp.Domain\obj\Debug\net8.0\ref\TransferApp.Domain.dll

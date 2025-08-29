@@ -1,0 +1,89 @@
+<div class="vacancy-list">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2>Available Vacancies</h2>
+      <p class="text-muted">Browse and search through available medical officer positions.</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <a routerLink="/preferences" class="btn btn-primary">
+        <i class="bi bi-list-check me-2"></i>Manage Preferences
+      </a>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card bg-primary text-white">
+        <div class="card-body text-center">
+          <h4 class="mb-0">{{ getTotalVacancies() }}</h4>
+          <small>Total Positions</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-info text-white">
+        <div class="card-body text-center">
+          <h4 class="mb-0">{{ vacancies.length }}</h4>
+          <small>Total Vacancies</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-warning text-dark">
+        <div class="card-body text-center">
+          <h4 class="mb-0">{{ getDifficultStationsCount() }}</h4>
+          <small>Difficult Stations</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <app-vacancy-filters (filtersChanged)="onFiltersChanged($event)"></app-vacancy-filters>
+
+  <!-- Vacancies List -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Vacancies ({{ filteredVacancies.length }})</h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading vacancies...</p>
+      </div>
+
+      <div *ngIf="!loading && filteredVacancies.length === 0" class="text-center py-5 text-muted">
+        <i class="bi bi-search" style="font-size: 3rem;"></i>
+        <p class="mt-2">No vacancies found matching your criteria.</p>
+        <p class="small">Try adjusting your filters or search terms.</p>
+      </div>
+
+      <div *ngIf="!loading && filteredVacancies.length > 0">
+        <div *ngFor="let vacancy of filteredVacancies" class="card mb-3" [class.border-warning]="vacancy.isDifficultStation">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h6 class="card-title mb-1">{{ vacancy.designation }}</h6>
+                <p class="card-text text-muted mb-2">
+                  <strong>{{ vacancy.institution }}</strong> - {{ vacancy.district }}
+                </p>
+                <div class="d-flex gap-2">
+                  <span class="badge bg-primary">{{ vacancy.count }} position(s)</span>
+                  <span *ngIf="vacancy.isDifficultStation" class="badge bg-warning text-dark">Difficult Station</span>
+                </div>
+              </div>
+              <div class="col-md-4 text-end">
+                <a routerLink="/preferences" [queryParams]="{vacancyId: vacancy.id}" class="btn btn-outline-primary btn-sm">
+                  <i class="bi bi-plus-circle me-1"></i>Add to Preferences
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

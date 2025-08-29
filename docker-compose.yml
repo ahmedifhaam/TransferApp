@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: transferapp-postgres
+    environment:
+      POSTGRES_DB: transferapp
+      POSTGRES_USER: transferapp
+      POSTGRES_PASSWORD: transferapp123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - transferapp-network
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: TransferApp.Api/Dockerfile
+    container_name: transferapp-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__Default=Host=postgres;Database=transferapp;Username=transferapp;Password=transferapp123
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    networks:
+      - transferapp-network
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: ./transfer-app-ui
+      dockerfile: Dockerfile
+    container_name: transferapp-nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    networks:
+      - transferapp-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  transferapp-network:
+    driver: bridge
+

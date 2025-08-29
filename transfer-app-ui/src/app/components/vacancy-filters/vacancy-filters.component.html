@@ -1,0 +1,105 @@
+<div class="card mb-4">
+  <div class="card-header">
+    <h6 class="mb-0">
+      <i class="bi bi-funnel me-2"></i>Filter Vacancies
+      <button *ngIf="hasActiveFilters()" 
+              class="btn btn-sm btn-outline-secondary float-end" 
+              (click)="clearFilters()">
+        <i class="bi bi-x-circle me-1"></i>Clear All
+      </button>
+    </h6>
+  </div>
+  <div class="card-body">
+    <div *ngIf="loading" class="text-center py-3">
+      <div class="spinner-border spinner-border-sm text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && filterOptions" class="row g-3">
+      <!-- Search -->
+      <div class="col-md-6">
+        <label class="form-label">Search</label>
+        <input type="text" 
+               class="form-control" 
+               placeholder="Search vacancies, institutions, districts..."
+               [(ngModel)]="filters.search"
+               (ngModelChange)="onFilterChange()">
+      </div>
+
+      <!-- District Filter -->
+      <div class="col-md-6">
+        <label class="form-label">District</label>
+        <select class="form-select" 
+                [(ngModel)]="filters.district"
+                (ngModelChange)="onFilterChange()">
+          <option value="">All Districts</option>
+          <option *ngFor="let district of filterOptions.districts" [value]="district">
+            {{ district }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Institution Filter -->
+      <div class="col-md-6">
+        <label class="form-label">Institution</label>
+        <select class="form-select" 
+                [(ngModel)]="filters.institution"
+                (ngModelChange)="onFilterChange()">
+          <option value="">All Institutions</option>
+          <option *ngFor="let institution of filterOptions.institutions" [value]="institution">
+            {{ institution }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Designation Filter -->
+      <div class="col-md-6">
+        <label class="form-label">Designation</label>
+        <select class="form-select" 
+                [(ngModel)]="filters.designation"
+                (ngModelChange)="onFilterChange()">
+          <option value="">All Designations</option>
+          <option *ngFor="let designation of filterOptions.designations" [value]="designation">
+            {{ designation }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Count Range -->
+      <div class="col-md-3">
+        <label class="form-label">Min Positions</label>
+        <input type="number" 
+               class="form-control" 
+               [min]="filterOptions.countRange.minCount"
+               [max]="filterOptions.countRange.maxCount"
+               [(ngModel)]="filters.minCount"
+               (ngModelChange)="onFilterChange()"
+               placeholder="Min">
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Max Positions</label>
+        <input type="number" 
+               class="form-control" 
+               [min]="filterOptions.countRange.minCount"
+               [max]="filterOptions.countRange.maxCount"
+               [(ngModel)]="filters.maxCount"
+               (ngModelChange)="onFilterChange()"
+               placeholder="Max">
+      </div>
+
+      <!-- Difficult Station Filter -->
+      <div class="col-md-6">
+        <label class="form-label">Station Type</label>
+        <select class="form-select" 
+                [(ngModel)]="filters.isDifficultStation"
+                (ngModelChange)="onFilterChange()">
+          <option [ngValue]="undefined">All Stations</option>
+          <option [ngValue]="false">Regular Stations</option>
+          <option [ngValue]="true">Difficult Stations</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>

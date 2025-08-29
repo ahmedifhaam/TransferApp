@@ -1,0 +1,200 @@
+<div class="preferences">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2>Manage Preferences</h2>
+      <p class="text-muted">Drag and drop to reorder your preferred vacancies. Higher positions have higher priority.</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <button class="btn btn-success me-2" (click)="savePreferences()" [disabled]="saving || preferences.length === 0">
+        <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+        {{ saving ? 'Saving...' : 'Save Preferences' }}
+      </button>
+      <button class="btn btn-outline-primary me-2" (click)="exportToPDF()" [disabled]="!doctor || preferences.length === 0">
+        <i class="bi bi-file-pdf me-1"></i>Export PDF
+      </button>
+      <button class="btn btn-outline-danger" (click)="clearPreferences()" [disabled]="preferences.length === 0">
+        Clear All
+      </button>
+    </div>
+  </div>
+
+  <!-- Doctor Selection -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <label for="meritRank" class="form-label">Merit Rank</label>
+      <input 
+        type="number" 
+        class="form-control" 
+        id="meritRank"
+        [(ngModel)]="meritRank"
+        (change)="onMeritRankChange()"
+        min="1"
+        placeholder="Enter your Merit Rank"
+        [readonly]="isMeritRankReadonly"
+      >
+      <div class="form-text">
+        <span *ngIf="isMeritRankReadonly">
+          <strong>Logged in as Doctor with Merit Rank: {{ meritRank }}</strong>
+        </span>
+        <span *ngIf="!isMeritRankReadonly">
+          Enter merit rank to load and save preferences for any doctor.
+        </span>
+        <span *ngIf="availableDoctorIds.length > 0" class="text-info d-block mt-1">
+          Available Ranks: {{ availableDoctorIds.slice(0, 5).join(', ') }}{{ availableDoctorIds.length > 5 ? '...' : '' }}
+        </span>
+      </div>
+      <div *ngIf="doctorError" class="alert alert-warning mt-3">
+        <strong>Note:</strong> {{ doctorError }}
+        <div class="mt-2">
+          <a routerLink="/import" class="btn btn-sm btn-outline-warning">Go to Import Data</a>
+        </div>
+      </div>
+      <div *ngIf="doctor" class="alert alert-secondary mt-3">
+        <div><strong>{{ doctor.fullName }}</strong></div>
+        <div>{{ getEffectiveRankText() }}</div>
+        <div *ngIf="doctor.partnerDoctorId">Partner Doctor ID: {{ doctor.partnerDoctorId }}</div>
+        <div class="mt-2">
+          <button 
+            class="btn btn-sm btn-outline-primary" 
+            (click)="openCoupleModal()">
+            <i class="bi bi-people-fill me-1"></i>
+            {{ coupleInfo?.isInCouple ? 'Manage Couple' : 'Apply as Couple' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div *ngIf="assignedVacancy" class="card">
+        <div class="card-header" [class]="assignedVacancy.assigned ? 'bg-success text-white' : 'bg-warning text-dark'">
+          <h6 class="mb-0">{{ assignedVacancy.assigned ? 'Assigned Vacancy' : 'Assignment Status' }}</h6>
+        </div>
+        <div class="card-body">
+          <div *ngIf="assignedVacancy.assigned" class="mb-2">
+            <strong>{{ assignedVacancy.message }}</strong>
+          </div>
+          <div *ngIf="!assignedVacancy.assigned" class="mb-2">
+            <strong>{{ assignedVacancy.message }}</strong>
+          </div>
+          <div *ngIf="assignedVacancy.vacancy" class="mt-2">
+            <div class="badge bg-primary me-1">{{ assignedVacancy.vacancy.designation }}</div>
+            <div class="badge bg-secondary me-1">{{ assignedVacancy.vacancy.count }} positions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Available Vacancies -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Available Vacancies</h5>
+        </div>
+        <div class="card-body">
+          <!-- Filters -->
+          <app-vacancy-filters (filtersChanged)="onFiltersChanged($event)"></app-vacancy-filters>
+          
+          <div *ngIf="loading" class="text-center py-3">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          
+          <div *ngIf="!loading && getAvailableVacanciesForDisplay().length > 0">
+            <div *ngFor="let vacancy of getAvailableVacanciesForDisplay()" class="card mb-2" [class.border-warning]="vacancy.isDifficultStation">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="flex-grow-1">
+                    <h6 class="card-title mb-1">{{ vacancy.designation }}</h6>
+                    <p class="card-text text-muted mb-1 small">
+                      <strong>{{ vacancy.institution }}</strong> - {{ vacancy.district }}
+                    </p>
+                    <div class="d-flex gap-2">
+                      <span class="badge bg-primary">{{ vacancy.count }} position(s)</span>
+                      <span *ngIf="vacancy.isDifficultStation" class="badge bg-warning text-dark">Difficult</span>
+                    </div>
+                  </div>
+                  <button 
+                    class="btn btn-sm btn-outline-primary ms-2"
+                    (click)="addToPreferences(vacancy.id)"
+                    [disabled]="isInPreferences(vacancy.id)"
+                  >
+                    <i class="bi bi-plus"></i> Add
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div *ngIf="!loading && getAvailableVacanciesForDisplay().length === 0" class="text-center py-3 text-muted">
+            <i class="bi bi-search" style="font-size: 2rem;"></i>
+            <p class="mt-2">No vacancies found matching your criteria.</p>
+            <p class="small">Try adjusting your filters or search terms.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected Preferences -->
+    <div class="col-md-6">
+      <div class="card preferences-card">
+        <div class="card-header preferences-header">
+          <h5 class="mb-0 preferences-title">
+            <i class="bi bi-list-check me-2"></i>
+            Selected Preferences ({{ preferences.length }})
+          </h5>
+        </div>
+        <div class="card-body">
+          
+          <div *ngIf="preferences.length === 0" class="text-center py-5 text-muted">
+            <i class="bi bi-list-check" style="font-size: 2rem;"></i>
+            <p class="mt-2">No preferences selected yet.</p>
+            <p class="small">Drag vacancies from the left to add them to your preferences.</p>
+          </div>
+          
+          <div *ngIf="preferences.length > 0">
+            
+            <div class="preferences-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
+              <div *ngFor="let preference of preferences; let i = index" 
+                   class="preference-item" 
+                   cdkDrag>
+                <div class="drag-handle">
+                  <i class="bi bi-grip-vertical"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1">
+                    {{ getVacancyById(preference.vacancyId)?.designation || 'Vacancy ' + preference.vacancyId }}
+                  </h6>
+                  <p class="text-muted mb-1 small">
+                    <strong>{{ getVacancyById(preference.vacancyId)?.institution || 'Institution' }}</strong> - 
+                    {{ getVacancyById(preference.vacancyId)?.district || 'District' }}
+                  </p>
+                  <div class="d-flex gap-2">
+                    <span class="badge bg-primary">
+                      {{ getVacancyById(preference.vacancyId)?.count || '?' }} position(s)
+                    </span>
+                    <span *ngIf="getVacancyById(preference.vacancyId)?.isDifficultStation" class="badge bg-warning text-dark">Difficult</span>
+                    <span class="badge bg-secondary">Rank {{ i + 1 }}</span>
+                  </div>
+                </div>
+                <button class="btn btn-sm btn-outline-danger ms-2" (click)="removeFromPreferences(preference.vacancyId)">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Couple Application Modal -->
+<app-couple-application-modal
+  [isOpen]="showCoupleModal"
+  [currentDoctorMeritRank]="meritRank"
+  [currentDoctorName]="doctor?.fullName || ''"
+  (modalClosed)="closeCoupleModal()"
+  (coupleApplicationCreated)="onCoupleApplicationCreated()">
+</app-couple-application-modal>

@@ -1,0 +1,396 @@
+<div class="reports">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2>Transfer Reports & Analytics</h2>
+      <p class="text-muted">Comprehensive overview of transfer applications, assignments, and statistics.</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <button class="btn btn-primary me-2" (click)="refreshReports()" [disabled]="loading">
+        <i class="bi bi-arrow-clockwise me-1"></i>
+        {{ loading ? 'Loading...' : 'Refresh' }}
+      </button>
+      <button class="btn btn-outline-success me-2" (click)="exportToCSV()">
+        <i class="bi bi-download me-1"></i>Export CSV
+      </button>
+      <button class="btn btn-outline-danger" (click)="exportToPDF()" [disabled]="loading">
+        <i class="bi bi-file-pdf me-1"></i>Export PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Search and Filter Controls -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input 
+          type="text" 
+          class="form-control" 
+          placeholder="Search doctors, vacancies, or institutions..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+        >
+      </div>
+    </div>
+    <div class="col-md-3">
+      <select 
+        class="form-select" 
+        [(ngModel)]="selectedFilter"
+        (change)="onFilterChange()"
+      >
+        <option value="all">All Data</option>
+        <option value="doctors">Doctors Only</option>
+        <option value="vacancies">Vacancies Only</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <div class="d-flex gap-2">
+        <span class="badge bg-info">{{ filteredDoctorApplications.length }} Doctors</span>
+        <span class="badge bg-success">{{ filteredVacancyApplications.length }} Vacancies</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auto-refresh and Last Updated -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <button 
+        class="btn btn-sm" 
+        [class]="autoRefresh ? 'btn-warning' : 'btn-outline-warning'"
+        (click)="toggleAutoRefresh()"
+      >
+        <i class="bi" [class]="autoRefresh ? 'bi-pause-circle' : 'bi-play-circle'"></i>
+        {{ autoRefresh ? 'Stop Auto-refresh' : 'Start Auto-refresh' }}
+      </button>
+      <small class="text-muted ms-2">Refreshes every 30 seconds</small>
+    </div>
+    <div class="col-md-6 text-end">
+      <small class="text-muted">
+        <i class="bi bi-clock me-1"></i>
+        Last updated: {{ lastUpdated ? (lastUpdated | date:'medium') : 'Never' }}
+      </small>
+    </div>
+  </div>
+
+  <!-- Quick Insights -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-primary">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-lightbulb me-2"></i>
+            Quick Insights
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 text-center">
+              <div class="border-end">
+                <h6 class="text-muted">Top Priority</h6>
+                <p class="fw-bold text-primary mb-0">
+                  {{ getTopPriorityDoctor() }}
+                </p>
+              </div>
+            </div>
+            <div class="col-md-3 text-center">
+              <div class="border-end">
+                <h6 class="text-muted">Most Competitive</h6>
+                <p class="fw-bold text-warning mb-0">
+                  {{ getMostCompetitiveVacancy() }}
+                </p>
+              </div>
+            </div>
+            <div class="col-md-3 text-center">
+              <div class="border-end">
+                <h6 class="text-muted">Easiest to Fill</h6>
+                <p class="fw-bold text-success mb-0">
+                  {{ getEasiestVacancyToFill() }}
+                </p>
+              </div>
+            </div>
+            <div class="col-md-3 text-center">
+              <div>
+                <h6 class="text-muted">Couple Impact</h6>
+                <p class="fw-bold text-info mb-0">
+                  {{ getCoupleImpact() }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Overview -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-primary">{{ reports.statistics.totalDoctors || 0 }}</h3>
+          <p class="card-text">Total Doctors</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-success">{{ reports.statistics.totalVacancies || 0 }}</h3>
+          <p class="card-text">Total Vacancies</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-info">{{ reports.statistics.totalPositions || 0 }}</h3>
+          <p class="card-text">Total Positions</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-warning">{{ reports.statistics.difficultStations || 0 }}</h3>
+          <p class="card-text">Difficult Stations</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assignment Summary -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Assignment Summary</h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-4">
+              <h4 class="text-success">{{ reports.assignmentSummary.assignedCount || 0 }}</h4>
+              <small class="text-muted">Assigned</small>
+            </div>
+            <div class="col-4">
+              <h4 class="text-warning">{{ reports.assignmentSummary.unassignedCount || 0 }}</h4>
+              <small class="text-muted">Unassigned</small>
+            </div>
+            <div class="col-4">
+              <h4 class="text-primary">{{ reports.assignmentSummary.assignmentRate || '0' }}%</h4>
+              <small class="text-muted">Success Rate</small>
+            </div>
+          </div>
+          <!-- Progress Bar -->
+          <div class="mt-3">
+            <div class="d-flex justify-content-between mb-1">
+              <small class="text-muted">Assignment Progress</small>
+              <small class="text-muted">{{ reports.assignmentSummary.assignedCount || 0 }} / {{ reports.assignmentSummary.totalDoctors || 0 }}</small>
+            </div>
+            <div class="progress" style="height: 8px;">
+              <div 
+                class="progress-bar bg-success" 
+                role="progressbar" 
+                [style.width.%]="reports.assignmentSummary.assignmentRate || 0"
+                [attr.aria-valuenow]="reports.assignmentSummary.assignedCount || 0"
+                [attr.aria-valuemin]="0"
+                [attr.aria-valuemax]="reports.assignmentSummary.totalDoctors || 0"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Additional Statistics</h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-6">
+              <h4 class="text-info">{{ reports.statistics.totalCouples || 0 }}</h4>
+              <small class="text-muted">Couple Applications</small>
+            </div>
+            <div class="col-6">
+              <h4 class="text-secondary">{{ reports.statistics.averagePreferencesPerDoctor || '0' }}</h4>
+              <small class="text-muted">Avg Preferences/Doctor</small>
+            </div>
+          </div>
+          <!-- Additional Metrics -->
+          <div class="row mt-3 text-center">
+            <div class="col-6">
+              <small class="text-muted">Most Popular Vacancy</small>
+              <div class="fw-bold text-primary">
+                {{ getMostPopularVacancy() }}
+              </div>
+            </div>
+            <div class="col-6">
+              <small class="text-muted">Least Popular Vacancy</small>
+              <div class="fw-bold text-warning">
+                {{ getLeastPopularVacancy() }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Doctor Applications -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Doctor Applications & Assignments</h5>
+            <button class="btn btn-sm btn-outline-danger" (click)="exportDoctorPreferencesToPDF()" [disabled]="filteredDoctorApplications.length === 0">
+              <i class="bi bi-file-pdf me-1"></i>Export Preferences PDF
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-container">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Merit Rank</th>
+                  <th>Doctor Name</th>
+                  <th>Preferences</th>
+                  <th>Assigned Vacancy</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let app of filteredDoctorApplications">
+                  <td>
+                    <span class="badge bg-primary">{{ app.doctor.meritRank }}</span>
+                  </td>
+                  <td>{{ app.doctor.fullName }}</td>
+                  <td>
+                    <span class="badge bg-info">{{ app.preferencesCount }}</span>
+                  </td>
+                  <td>
+                    <span *ngIf="app.assignedVacancy" class="text-success">
+                      {{ app.assignedVacancy.designation }} - {{ app.assignedVacancy.institution }}
+                    </span>
+                    <span *ngIf="!app.assignedVacancy" class="text-muted">Not assigned</span>
+                  </td>
+                  <td>
+                    <span *ngIf="app.isAssigned" class="badge bg-success">Assigned</span>
+                    <span *ngIf="!app.isAssigned" class="badge bg-warning">Unassigned</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div *ngIf="filteredDoctorApplications.length === 0" class="text-center py-3 text-muted">
+              <i class="bi bi-info-circle me-2"></i>
+              No doctors found matching the current search criteria.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vacancy Applications -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Vacancy Applications & Popularity</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-container">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Vacancy</th>
+                  <th>Institution</th>
+                  <th>District</th>
+                  <th>Positions</th>
+                  <th>Preference Count</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let app of filteredVacancyApplications">
+                  <td>
+                    <strong>{{ app.vacancy.designation }}</strong>
+                    <span *ngIf="app.vacancy.isDifficultStation" class="badge bg-warning ms-1">Difficult</span>
+                  </td>
+                  <td>{{ app.vacancy.institution }}</td>
+                  <td>{{ app.vacancy.district }}</td>
+                  <td>
+                    <span class="badge bg-primary">{{ app.vacancy.count }}</span>
+                  </td>
+                  <td>
+                    <span class="badge bg-info">{{ app.preferenceCount }}</span>
+                  </td>
+                  <td>
+                    <span *ngIf="app.isFullyAssigned" class="badge bg-success">Fully Assigned</span>
+                    <span *ngIf="!app.isFullyAssigned" class="badge bg-warning">Available</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div *ngIf="filteredVacancyApplications.length === 0" class="text-center py-3 text-muted">
+              <i class="bi bi-info-circle me-2"></i>
+              No vacancies found matching the current search criteria.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Couple Applications -->
+  <div class="row mb-4" *ngIf="reports.coupleApplications.length > 0">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Couple Applications</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-container">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Doctor 1</th>
+                  <th>Doctor 2</th>
+                  <th>Effective Merit Rank</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let couple of reports.coupleApplications">
+                  <td>
+                    <span class="badge bg-primary me-1">{{ couple.doctor1.meritRank }}</span>
+                    {{ couple.doctor1.fullName }}
+                  </td>
+                  <td>
+                    <span class="badge bg-primary me-1">{{ couple.doctor2.meritRank }}</span>
+                    {{ couple.doctor2.fullName }}
+                  </td>
+                  <td>
+                    <span class="badge bg-warning">{{ couple.effectiveMeritRank }}</span>
+                  </td>
+                  <td>{{ couple.createdAt | date:'short' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading reports...</span>
+    </div>
+    <p class="mt-3 text-muted">Loading comprehensive reports...</p>
+  </div>
+</div>

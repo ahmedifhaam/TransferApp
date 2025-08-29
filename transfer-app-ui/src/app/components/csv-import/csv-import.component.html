@@ -1,0 +1,137 @@
+<div class="csv-import">
+  <div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+      <div>
+        <h2>Import Data</h2>
+        <p class="text-muted">Upload the three CSV files to populate the system with vacancies, difficult stations, and doctors information.</p>
+      </div>
+      <div>
+        <button class="btn btn-outline-danger" (click)="onClearAll()" [disabled]="uploading">
+          <i class="bi bi-trash"></i> Clear All Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Status -->
+  <div *ngIf="uploadStatus" class="row mb-4">
+    <div class="col-12">
+      <div class="alert" [class]="uploading ? 'alert-info' : (uploadStatus.includes('Error') ? 'alert-danger' : 'alert-success')">
+        <div *ngIf="uploading" class="d-flex align-items-center">
+          <div class="spinner-border spinner-border-sm me-2" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          {{ uploadStatus }}
+        </div>
+        <div *ngIf="!uploading">{{ uploadStatus }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Vacancies Import -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-building"></i> Vacancies
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">{{ getFileDescription('vacancies') }}</p>
+          <div class="mb-3">
+            <label for="vacancies-file" class="form-label">Select CSV File</label>
+            <input 
+              type="file" 
+              class="form-control" 
+              id="vacancies-file"
+              accept=".csv"
+              (change)="onFileSelected($event, 'vacancies')"
+              [disabled]="uploading"
+            >
+          </div>
+          <small class="text-muted">
+            Expected columns: INDEX, DISTRICT, INSTITUTION, DESIGNATION, VACANCIES
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Difficult Stations Import -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0">
+            <i class="bi bi-exclamation-triangle"></i> Difficult Stations
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">{{ getFileDescription('difficult-stations') }}</p>
+          <div class="mb-3">
+            <label for="difficult-stations-file" class="form-label">Select CSV File</label>
+            <input 
+              type="file" 
+              class="form-control" 
+              id="difficult-stations-file"
+              accept=".csv"
+              (change)="onFileSelected($event, 'difficult-stations')"
+              [disabled]="uploading"
+            >
+          </div>
+          <small class="text-muted">
+            Expected columns: SN, PROVINCE, RDHS, STATION
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Doctors Import -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-person-badge"></i> Doctors
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">{{ getFileDescription('doctors') }}</p>
+          <div class="mb-3">
+            <label for="doctors-file" class="form-label">Select CSV File</label>
+            <input 
+              type="file" 
+              class="form-control" 
+              id="doctors-file"
+              accept=".csv"
+              (change)="onFileSelected($event, 'doctors')"
+              [disabled]="uploading"
+            >
+          </div>
+          <small class="text-muted">
+            Expected format: First column contains doctor names
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instructions -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Import Instructions</h5>
+        </div>
+        <div class="card-body">
+          <ol>
+            <li><strong>Vacancies:</strong> Upload the main vacancy list first. This creates the foundation of available positions.</li>
+            <li><strong>Difficult Stations:</strong> Upload the difficult stations list to mark challenging locations with a warning badge.</li>
+            <li><strong>Doctors:</strong> Upload the doctors list to populate the system with medical officers and their merit rankings.</li>
+          </ol>
+          <div class="alert alert-info">
+            <strong>Note:</strong> The order of import matters. Vacancies should be imported first, followed by difficult stations, then doctors.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

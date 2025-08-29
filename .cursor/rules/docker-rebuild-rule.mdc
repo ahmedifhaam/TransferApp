@@ -1,0 +1,32 @@
+# Docker Rebuild Rule
+
+**IMPORTANT**: When making code changes that require rebuilding Docker images, ALWAYS follow this sequence:
+
+1. **Stop and remove existing containers**: `docker-compose down`
+2. **Remove the specific images**: `docker rmi [image-names]` or `docker rmi $(docker images -q)`
+3. **Rebuild with no cache**: `docker-compose build --no-cache`
+4. **Start fresh containers**: `docker-compose up -d`
+
+**Why this is necessary**: 
+- Simply rebuilding an image doesn't automatically update running containers
+- Old containers continue using the previous image version
+- Code changes won't take effect until containers are recreated
+- This prevents "ghost" behavior where old code appears to still be running
+
+**Common mistake**: Only running `docker-compose build` without removing containers
+**Correct approach**: Full container removal + rebuild + recreation
+
+**Example workflow**:
+```bash
+# After making code changes:
+docker-compose down
+docker rmi transferapp-api transferapp-nginx
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+This rule applies to ALL Docker-based development work in this project.
+description:
+globs:
+alwaysApply: true
+---

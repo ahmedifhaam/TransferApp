@@ -1,0 +1,93 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="closeModal()"></div>
+
+<div class="modal" *ngIf="isOpen">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">
+        <i class="bi bi-people-fill me-2"></i>
+        Couple Application
+      </h5>
+      <button type="button" class="btn-close" (click)="closeModal()"></button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Current Doctor Info -->
+      <div class="alert alert-info">
+        <strong>{{ currentDoctorName }}</strong><br>
+        {{ getEffectiveRankText() }}
+      </div>
+
+      <!-- Current Couple Status -->
+      <div *ngIf="getPartnerInfo()" class="alert alert-success">
+        <h6 class="mb-2">
+          <i class="bi bi-heart-fill me-2"></i>
+          Currently Coupled With
+        </h6>
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ getPartnerInfo()?.fullName }}</strong><br>
+            <small class="text-muted">Merit Rank: {{ getPartnerInfo()?.meritRank }}</small>
+          </div>
+          <button 
+            class="btn btn-sm btn-outline-danger" 
+            (click)="removeCoupleApplication()"
+            [disabled]="loading">
+            <i class="bi bi-x-circle me-1"></i>Remove
+          </button>
+        </div>
+      </div>
+
+      <!-- Create New Couple Application -->
+      <div *ngIf="!coupleInfo?.isInCouple">
+        <h6 class="mb-3">Apply as Couple</h6>
+        <p class="text-muted small mb-3">
+          When you apply as a couple, both doctors will use the lower merit rank for assignments. 
+          This helps couples get nearby locations.
+        </p>
+
+        <div class="mb-3">
+          <label for="partnerMeritRank" class="form-label">Partner's Merit Rank</label>
+          <input 
+            type="number" 
+            class="form-control" 
+            id="partnerMeritRank"
+            [(ngModel)]="partnerMeritRank"
+            placeholder="Enter partner's merit rank"
+            min="1">
+          <div class="form-text">
+            Enter the merit rank of the doctor you want to apply with
+          </div>
+        </div>
+
+        <div class="d-grid">
+          <button 
+            class="btn btn-primary" 
+            (click)="applyAsCouple()"
+            [disabled]="loading || !partnerMeritRank">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+            <i class="bi bi-heart me-2"></i>
+            {{ loading ? 'Creating...' : 'Apply as Couple' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Error Messages -->
+      <div *ngIf="error" class="alert alert-danger mt-3">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ error }}
+      </div>
+
+      <!-- Success Messages -->
+      <div *ngIf="success" class="alert alert-success mt-3">
+        <i class="bi bi-check-circle me-2"></i>
+        {{ success }}
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeModal()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,260 @@
+.pdf-preferences-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h2 {
+      color: #2c3e50;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: #7f8c8d;
+      font-size: 1.1rem;
+    }
+  }
+
+  .upload-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .file-upload-area {
+    width: 100%;
+    max-width: 500px;
+    border: 3px dashed #bdc3c7;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    background: #f8f9fa;
+
+    &.has-file {
+      border-color: #27ae60;
+      background: #e8f5e8;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .file-label {
+      cursor: pointer;
+      display: block;
+
+      .upload-icon {
+        color: #7f8c8d;
+        margin-bottom: 1rem;
+      }
+
+      .upload-text {
+        font-size: 1.2rem;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+      }
+
+      .upload-hint {
+        font-size: 0.9rem;
+        color: #95a5a6;
+      }
+    }
+  }
+
+  .extract-btn, .confirm-btn {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #3498db;
+    color: white;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .message {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+
+    &.message-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    &.message-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: inherit;
+    }
+  }
+
+  .preferences-section {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+
+    h3 {
+      color: #2c3e50;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    > p {
+      color: #7f8c8d;
+      margin-bottom: 2rem;
+    }
+  }
+
+  .preferences-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .preference-item {
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    padding: 1.5rem;
+    background: #f8f9fa;
+
+    &.mapped {
+      border-color: #27ae60;
+      background: #e8f5e8;
+    }
+
+    .extracted-info {
+      margin-bottom: 1.5rem;
+
+      h4 {
+        color: #2c3e50;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+      }
+
+      .extracted-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.5rem;
+
+        p {
+          margin: 0;
+          color: #34495e;
+          font-size: 0.95rem;
+
+          strong {
+            color: #2c3e50;
+          }
+        }
+      }
+    }
+
+    .vacancy-mapping {
+      label {
+        display: block;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+      }
+
+      .vacancy-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #bdc3c7;
+        border-radius: 6px;
+        font-size: 1rem;
+        background: white;
+      }
+    }
+  }
+
+  .actions {
+    text-align: center;
+  }
+
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #ecf0f1;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: #2c3e50;
+      font-size: 1.1rem;
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .pdf-preferences-container {
+    padding: 1rem;
+
+    .header h2 {
+      font-size: 2rem;
+    }
+
+    .file-upload-area {
+      padding: 2rem 1rem;
+    }
+
+    .preference-item .extracted-details {
+      grid-template-columns: 1fr;
+    }
+
+    .extract-btn, .confirm-btn {
+      width: 100%;
+    }
+  }
+}
+
